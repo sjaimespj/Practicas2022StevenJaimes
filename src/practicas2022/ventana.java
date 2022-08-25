@@ -2,7 +2,9 @@ package practicas2022;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -290,5 +292,16 @@ public class ventana extends JFrame {
         JButton btnCargarArchivo = new JButton("Buscar archivo CSV");
         btnCargarArchivo.setBounds(350, 10, 200, 25);
         panelControlClientes.add(btnCargarArchivo);
+        ActionListener buscarArchivo = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+               File archivoSeleccionado;
+               JFileChooser ventanaSeleccion = new JFileChooser();
+               ventanaSeleccion.showOpenDialog(null);
+               archivoSeleccionado = ventanaSeleccion.getSelectedFile();
+            }
+        };
+        btnCargarArchivo.addActionListener(buscarArchivo);
     } 
 }
