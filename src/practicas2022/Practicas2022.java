@@ -1,6 +1,7 @@
 
 package practicas2022;
 import javax.swing.JFrame;
+
 public class Practicas2022 {
 
     public static void main(String[] args) {
@@ -10,8 +11,7 @@ public class Practicas2022 {
        marco.setSize(450, 350);
        marco.setLocationRelativeTo(null);
        marco.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-       
-               
+
     }
     
 }
