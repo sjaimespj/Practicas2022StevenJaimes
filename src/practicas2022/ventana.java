@@ -2,7 +2,10 @@ package practicas2022;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -281,9 +284,6 @@ public class ventana extends JFrame {
         }
         
         
-        
-        
-        
         JTable tablaClientes = new JTable(datosTabla);
         JScrollPane barraTablaClientes = new JScrollPane(tablaClientes);
         barraTablaClientes.setBounds(10, 10, 300, 100);
@@ -293,15 +293,31 @@ public class ventana extends JFrame {
         btnCargarArchivo.setBounds(350, 10, 200, 25);
         panelControlClientes.add(btnCargarArchivo);
         ActionListener buscarArchivo = new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                File archivoSeleccionado;
                JFileChooser ventanaSeleccion = new JFileChooser();
                ventanaSeleccion.showOpenDialog(null);
                archivoSeleccionado = ventanaSeleccion.getSelectedFile();
+               System.out.println("La ubicacion del archivo es " + archivoSeleccionado.getPath());
+               leerArchivoCSV(archivoSeleccionado.getPath());
             }
         };
         btnCargarArchivo.addActionListener(buscarArchivo);
-    } 
+    }
+    public void leerArchivoCSV(String ruta){
+        try{
+          BufferedReader archivoTemporal = new BufferedReader(new FileReader(ruta)); 
+          String lineaLeida = "";
+          while(lineaLeida != null){
+              lineaLeida = archivoTemporal.readLine();
+              if(lineaLeida != null){
+                  System.out.println(lineaLeida);
+              }
+          }
+          archivoTemporal.close();
+        }catch(IOException error){
+            JOptionPane.showMessageDialog(null, "No se pudo avrir el archivo CSV");
+        }
+    }
 }
