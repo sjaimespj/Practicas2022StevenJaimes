@@ -9,7 +9,7 @@ public class Practicas2022 {
        marco.setVisible(true);
        marco.setTitle("Sitema de administrativo de clientes y recursos" );
        marco.setSize(450, 350);
-       marco.setLocationRelativeTo(null);
+       //marco.setLocationRelativeTo(null);
        marco.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }

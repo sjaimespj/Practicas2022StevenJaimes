@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -16,17 +17,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 public class ventana extends JFrame {
 
     usuario usuSistema[] = new usuario[10];
-    JPanel panelInicioSesion = new JPanel();
-    JPanel panelControl = new JPanel();
-    JPanel panelCrearUsuario = new JPanel();
+    JPanel panelInicioSesion;
+    JPanel panelControl;
+    JPanel panelCrearUsuario;
     int control = 1;
     cliente clientes[] = new cliente[100];
     int controlCliente = 0;
-    JPanel panelControlClientes = new JPanel(); 
+    JPanel panelControlClientes;
+    int controlClientes = 2;
 
     public ventana() {
         objetos();
@@ -40,21 +48,23 @@ public class ventana extends JFrame {
         usuSistema[0].nombre = "administrador";
         usuSistema[0].contra = "123456";
     }
-    public void crearClientes(){
+
+    public void crearClientes() {
         clientes[0] = new cliente();
-        clientes[0].nombre = "cliente 2";
+        clientes[0].nombre = "cliente 1";
         clientes[0].edad = 30;
         clientes[0].genero = 'F';
         clientes[0].nit = 300;
-        
+
         clientes[1] = new cliente();
-        clientes[1].nombre = "cliente 1";
+        clientes[1].nombre = "cliente 2";
         clientes[1].edad = 22;
         clientes[1].genero = 'M';
         clientes[1].nit = 150;
     }
 
     public void objetos() {
+        panelInicioSesion = new JPanel();
         this.getContentPane().add(panelInicioSesion);
         panelInicioSesion.setLayout(null);
 
@@ -128,6 +138,7 @@ public class ventana extends JFrame {
     }
 
     public void panelControl() {
+        panelControl = new JPanel();
         this.getContentPane().add(panelControl);
         panelControl.setLayout(null);
         this.setSize(600, 500);
@@ -156,6 +167,7 @@ public class ventana extends JFrame {
     }
 
     public void crearUsuario() {
+        panelCrearUsuario = new JPanel();
         this.getContentPane().add(panelCrearUsuario);
         panelCrearUsuario.setLayout(null);
         this.setSize(500, 450);
@@ -251,73 +263,242 @@ public class ventana extends JFrame {
                     break;
                 }
             }
-             //System.out.println("La posicion libre es" + posicion);
-        usuSistema[posicion] = new usuario();
-        usuSistema[posicion].nombreUsuario = nombre;
-        usuSistema[posicion].nombre = nombreUsuario;
-        usuSistema[posicion].contra = contra;
-        control++;
-        JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente, total de usuarios " + control);
-            
-        }else{
+            //System.out.println("La posicion libre es" + posicion);
+            usuSistema[posicion] = new usuario();
+            usuSistema[posicion].nombreUsuario = nombre;
+            usuSistema[posicion].nombre = nombreUsuario;
+            usuSistema[posicion].contra = contra;
+            control++;
+            JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente, total de usuarios " + control);
+
+        } else {
             JOptionPane.showMessageDialog(null, "no se puede registrar mas usuarios");
         }
     }
-    public void panelControlCli(){
+
+    public void panelControlCli() {
+        panelControlClientes = new JPanel();
         this.getContentPane().add(panelControlClientes);
         panelControlClientes.setLayout(null);
-        this.setSize(750, 500);
+        this.setSize(950, 500);
         this.setTitle("Administracion de Clientes");
         panelControl.setVisible(false);
-        
+
         DefaultTableModel datosTabla = new DefaultTableModel();
         datosTabla.addColumn("Nombre");
         datosTabla.addColumn("Edad");
         datosTabla.addColumn("Genero");
         datosTabla.addColumn("Nit");
-        
+
         for (int i = 0; i < 100; i++) {
             if (clientes[i] != null) {
-              String fila [] = {clientes[i].nombre, String.valueOf(clientes[i].edad), String.valueOf(clientes[i].genero), String.valueOf(clientes[i].nit)}; 
-              datosTabla.addRow(fila);
+                String fila[] = {clientes[i].nombre, String.valueOf(clientes[i].edad), String.valueOf(clientes[i].genero), String.valueOf(clientes[i].nit)};
+                datosTabla.addRow(fila);
             }
         }
-        
-        
+
         JTable tablaClientes = new JTable(datosTabla);
         JScrollPane barraTablaClientes = new JScrollPane(tablaClientes);
         barraTablaClientes.setBounds(10, 10, 300, 100);
         panelControlClientes.add(barraTablaClientes);
-        
+
+        DefaultPieDataset datos = new DefaultPieDataset();
+        datos.setValue("Masculino", totalHombres());
+        datos.setValue("Femenino", totalMujeres());
+
+        JFreeChart graficoCircular = ChartFactory.createPieChart("Generos en el sistema", datos);
+        ChartPanel panelCircular = new ChartPanel(graficoCircular);
+        panelCircular.setBounds(10, 120, 300, 300);
+        panelControlClientes.add(panelCircular);
+
+        //System.out.println("Total de 18 a 30 " + rango18a30());
+        //System.out.println("Total de 31 a 45 " + rango31a45());
+        //System.out.println("Total de 45 o mas " + rango45mas());
+        DefaultCategoryDataset datos2 = new DefaultCategoryDataset();
+        datos2.addValue(rango18a30(), "18-30", "Edad");
+        datos2.addValue(rango31a45(), "31-45", "Edad");
+        datos2.addValue(rango45mas(), "Mayor a 45", "Edad");
+        JFreeChart graficoColumnas = ChartFactory.createBarChart("Rango de edades", "Edad", "Escala", datos2, PlotOrientation.VERTICAL, true, true, false);
+        ChartPanel panelColumnas = new ChartPanel(graficoColumnas);
+        panelColumnas.setBounds(450, 120, 300, 300);
+        panelControlClientes.add(panelColumnas);
+
         JButton btnCargarArchivo = new JButton("Buscar archivo CSV");
         btnCargarArchivo.setBounds(350, 10, 200, 25);
         panelControlClientes.add(btnCargarArchivo);
         ActionListener buscarArchivo = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-               File archivoSeleccionado;
-               JFileChooser ventanaSeleccion = new JFileChooser();
-               ventanaSeleccion.showOpenDialog(null);
-               archivoSeleccionado = ventanaSeleccion.getSelectedFile();
-               System.out.println("La ubicacion del archivo es " + archivoSeleccionado.getPath());
-               leerArchivoCSV(archivoSeleccionado.getPath());
+                File archivoSeleccionado;
+                JFileChooser ventanaSeleccion = new JFileChooser();
+                ventanaSeleccion.showOpenDialog(null);
+                archivoSeleccionado = ventanaSeleccion.getSelectedFile();
+                System.out.println("La ubicacion del archivo es " + archivoSeleccionado.getPath());
+                leerArchivoCSV(archivoSeleccionado.getPath());
+                panelControlClientes.setVisible(false);
+                panelControlCli();
             }
         };
         btnCargarArchivo.addActionListener(buscarArchivo);
+
+        JButton btnReporte = new JButton("Crear reporte HTML");
+        btnReporte.setBounds(650, 10, 200, 25);
+        panelControlClientes.add(btnReporte);
+        ActionListener crearHTML = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                crearReporte();
+            }
+        };
+        btnReporte.addActionListener(crearHTML);
+
     }
-    public void leerArchivoCSV(String ruta){
-        try{
-          BufferedReader archivoTemporal = new BufferedReader(new FileReader(ruta)); 
-          String lineaLeida = "";
-          while(lineaLeida != null){
-              lineaLeida = archivoTemporal.readLine();
-              if(lineaLeida != null){
-                  System.out.println(lineaLeida);
-              }
-          }
-          archivoTemporal.close();
-        }catch(IOException error){
-            JOptionPane.showMessageDialog(null, "No se pudo avrir el archivo CSV");
+
+    public void crearReporte() {
+        try {
+            PrintWriter escribirCSS = new PrintWriter("reportes/estilo.css", "UTF-8");
+            escribirCSS.println("html { font-size: 20px; font-family: 'Open San', sans-serif; }");
+            escribirCSS.println("h1 { font-size: 60px; text-aling: center; }");
+            escribirCSS.println("p, li { font-size: 16px; line-height: 2; letter-spacing: 1px; }");
+            escribirCSS.println("table { table-layout; fixed; width:250px;} td{border: 1px solid white; width: 190px; word-wrap: break-word}");
+            escribirCSS.println("html { background-color: #17202A}");
+            escribirCSS.println("body { width: 970px; margin: 0 auto; background-color: #FF0000; padding: 0 20px 20px 20px; border: 5px solid white; }");
+            escribirCSS.println("h1 { margin: 0; padding: 20px 0; color: FBFCFD; text-shadow: 3px 3px 1px black; }");
+            escribirCSS.close();
+            
+            PrintWriter escribir = new PrintWriter("reportes/reporte.html", "UTF-8");
+            escribir.println("<!doctype hmtl>");
+            escribir.println("<html>");
+            escribir.println("<head>");
+            escribir.println("<title>Reporte del sistema </title>");
+            escribir.println("<link rel=\"stylesheet\" href=\"estilo.css\">");
+            escribir.println("</head>");
+            escribir.println("<body>");
+            escribir.println("<h1>Listado de clientes en el sistema</h1>");
+            escribir.println("<br>");
+            
+            escribir.println("<table border = 1>");
+            escribir.println("<tr>");
+            escribir.println("<td>NIT</td> <td>Nombre</td> <td>Edad</td> <td>Genero</td>");
+            escribir.println("</tr>");
+            
+            for(int i = 0; i<99; i++){
+                if(clientes[i] != null){
+                    escribir.println("<tr>");
+                    escribir.println("<td>" + clientes[i].nit + "</td><td>" + clientes[i].nombre + "</td><td>" + clientes[i].edad + "</td><td>" + clientes[i].genero + "</td>");
+                    escribir.println("</tr>");
+                }
+            }
+            
+            escribir.println("</table>");
+            
+            escribir.println("</body>");
+            escribir.println("</html>");
+            
+            escribir.close();
+            JOptionPane.showMessageDialog(null, "Reporte creado con exito, esta se encuentra en la carpeta REPORTES");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "No se pudo crear el reporte");
+        }
+    }
+
+    public int totalHombres() {
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            if (clientes[i] != null) {
+                if (clientes[i].genero == 'M') {
+                    total++;
+                }
+            }
+
+        }
+        return total;
+    }
+
+    public int totalMujeres() {
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            if (clientes[i] != null) {
+                if (clientes[i].genero == 'F') {
+                    total++;
+                }
+            }
+
+        }
+        return total;
+    }
+
+    public int rango18a30() {
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            if (clientes[i] != null) {
+                if (clientes[i].edad >= 18 && clientes[i].edad <= 30) {
+                    total++;
+                }
+            }
+
+        }
+        return total;
+    }
+
+    public int rango31a45() {
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            if (clientes[i] != null) {
+                if (clientes[i].edad >= 31 && clientes[i].edad <= 45) {
+                    total++;
+                }
+            }
+
+        }
+        return total;
+    }
+
+    public int rango45mas() {
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            if (clientes[i] != null) {
+                if (clientes[i].edad > 45) {
+                    total++;
+                }
+            }
+
+        }
+        return total;
+    }
+
+    public void leerArchivoCSV(String ruta) {
+        try {
+            BufferedReader archivoTemporal = new BufferedReader(new FileReader(ruta));
+            String lineaLeida = "";
+            while (lineaLeida != null) {
+                lineaLeida = archivoTemporal.readLine();
+                if (lineaLeida != null) {
+                    String datosSeparados[] = lineaLeida.split(",");
+
+                    int posicion = 0;
+                    if (control < 100) {
+                        for (int i = 0; i < 99; i++) {
+                            if (clientes[i] == null) {
+                                posicion = i;
+                                break;
+                            }
+                        }
+                        clientes[posicion] = new cliente();
+                        clientes[posicion].nombre = datosSeparados[0];
+                        clientes[posicion].edad = Integer.parseInt(datosSeparados[1]);
+                        clientes[posicion].genero = datosSeparados[2].charAt(0);
+                        clientes[posicion].nit = Integer.parseInt(datosSeparados[3]);
+                        controlClientes++;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "no se puede registrar mas clientes");
+                    }
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Clientes registrados exitosamente, total de clientes " + controlClientes);
+            archivoTemporal.close();
+        } catch (IOException error) {
+            JOptionPane.showMessageDialog(null, "No pudo abrir el archivo CSV");
         }
     }
 }
