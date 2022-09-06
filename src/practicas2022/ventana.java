@@ -188,6 +188,7 @@ public class ventana extends JFrame {
             }
         };
         btnAdminProductos.addActionListener(administrarProductos);
+        
     }
 
     public void crearUsuario() {
@@ -564,7 +565,7 @@ public class ventana extends JFrame {
         panelControlProductos = new JPanel();
         this.getContentPane().add(panelControlProductos);
         panelControlProductos.setLayout(null);
-        this.setSize(950, 500);
+        this.setSize(750, 500);
         this.setTitle("Administracion de Productos");
         panelControl.setVisible(false);
 
@@ -583,7 +584,19 @@ public class ventana extends JFrame {
         JScrollPane barraTablaProductos = new JScrollPane(tablaProductos);
         barraTablaProductos.setBounds(10, 10, 300, 100);
         panelControlProductos.add(barraTablaProductos);
-
+        
+        //System.out.println("Total de 20 a 60 " + precio20a60());
+        //System.out.println("Total de 61 a 150 " + precio61a150());
+        //System.out.println("Total de 160 o mas " + precio160mas());
+        DefaultCategoryDataset datos2 = new DefaultCategoryDataset();
+        datos2.addValue(precio20a60(), "18-30", "Edad");
+        datos2.addValue(precio160mas(), "31-45", "Edad");
+        datos2.addValue(rango45mas(), "Mayor a 45", "Edad");
+        JFreeChart graficoColumnas = ChartFactory.createBarChart("Cantidad de Productos", "Precio", "Escala", datos2, PlotOrientation.VERTICAL, true, true, false);
+        ChartPanel panelColumnas = new ChartPanel(graficoColumnas);
+        panelColumnas.setBounds(10, 120, 300, 300);
+        panelControlProductos.add(panelColumnas);
+        
         JButton btnCargarArchivo2 = new JButton("Buscar archivoCSV");
         btnCargarArchivo2.setBounds(350, 10, 200, 25);
         panelControlProductos.add(btnCargarArchivo2);
@@ -605,6 +618,137 @@ public class ventana extends JFrame {
             }
         };
         btnCargarArchivo2.addActionListener(buscarArchivo2);
+        
+        JButton btnReporte2 = new JButton("Crear reporte HTML");
+        btnReporte2.setBounds(450, 50, 200, 25);
+        panelControlProductos.add(btnReporte2);
+        ActionListener crearHTML = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                crearReporte2();
+            }
+        };
+        btnReporte2.addActionListener(crearHTML);
+        
+        JButton btnVolver = new JButton("Volver al menu");
+        btnVolver.setBounds(350, 85, 200, 25);
+        panelControlProductos.add(btnVolver);
+        ActionListener volverInicio = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panelControl.setVisible(true);
+                panelControlProductos.setVisible(false);
+                volverInicio();
+            }
+        };
+        btnVolver.addActionListener(volverInicio);
+    }
+    public void ordenar2() {
+        producto actual;
+        producto adelante;
+        producto auxiliar;
+        for (int i = 0; i < 99; i++) {
+            for (int j = 0; j < 99; j++) {
+                if (productos[j + 1] == null) {
+                    break;
+                } else {
+                    if (productos[j].precio > productos[j + 1].precio) {
+                        auxiliar = productos[j + 1];
+                        productos[j + 1] = productos[j];
+                        productos[j] = auxiliar;
+                    }
+                }
+            }
+        }
+    }
+    
+    public void crearReporte2(){
+        try{
+            ordenar2();
+            PrintWriter escribirCSS = new PrintWriter("reportesProductos/estilo.css", "UTF-8");
+            escribirCSS.print("html {   font-size: 20px; font-family: 'Open Sans', sans-serif; }");
+            escribirCSS.print("h1 { font-size: 60px; text-align: center; }");
+            escribirCSS.print("p, li {   font-size: 16px;   line-height: 2;   letter-spacing: 1px; }");
+            escribirCSS.print("table { table-layout: fixed;   width:250px;}   td{border: 1px solid black; width: 190px;  word-wrap: break-word}");
+            escribirCSS.print("html { background-color: #17202A; }");
+            escribirCSS.print("body { width: 970px; margin: 0 auto; background-color: #00FFE4; padding: 0 20px 20px 20px; border: 5px solid white; }");
+            escribirCSS.print("h1 { margin: 0; padding: 20px 0; color: #F70505; text-shadow: 3px 3px 1px black; }");
+            escribirCSS.close();
+            
+            PrintWriter escribir = new PrintWriter("reportesProductos/index.html","UTF-8");
+            escribir.println("<!doctype hmtl>");
+            escribir.println("<html>");
+            escribir.println("<head>");
+            escribir.println("<title>Reporte del sistema </title>");
+            escribir.println("<link rel=\"stylesheet\" href=\"estilo.css\">");
+            escribir.println("</head>");
+            escribir.println("<body>");
+            escribir.println("<h1>Listado de productos en el sistema</h1>");
+            escribir.println("<br>");
+            
+            escribir.println("<table border = 1>");
+            escribir.println("<tr>");
+            escribir.println("<td>Nombre</td> <td>Precio</td> <td>Cantidad</td>");
+            escribir.println("</tr>");
+            
+            for (int i = 0; i < 99; i++) {
+                if (productos[i] != null) {
+                    escribir.println("<tr>");
+                    escribir.println("<td>" + productos[i].nombre + "</td><td>" + productos[i].precio + "</td><td>" + productos[i].cantidad + "</td>");
+                    escribir.println("</tr>");
+                }
+            }
+            
+            escribir.println("</table>");
+
+            escribir.println("</body>");
+            escribir.println("</html>");
+            
+            escribir.close();
+            JOptionPane.showMessageDialog(null, "Reporte creado con exito, esta se encuentra en la carpeta REPORTESPRODUCTOS");
+        }catch(IOException error){
+            JOptionPane.showMessageDialog(null, "No se pudo realizar el reporte");
+        }
+    }
+    
+    public int precio20a60() {
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            if (productos[i] != null) {
+                if (productos[i].precio >=20 && productos[i].precio <=60 ){
+                    total++;
+                }
+            }
+
+        }
+        return total;
+    }
+    
+    public int precio61a150() {
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            if (productos[i] != null) {
+                if (productos[i].precio >=61 && productos[i].precio <=150 ){
+                    total++;
+                }
+            }
+
+        }
+        return total;
+    }
+    
+    public int precio160mas() {
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            if (productos[i] != null) {
+                if (productos[i].precio >=160){
+                    total++;
+                }
+            }
+
+        }
+        return total;
     }
 
     public void leerArchivoCSV2(String ruta2) {
